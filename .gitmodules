@@ -6,10 +6,10 @@
 	url = https://github.com/hilookas/astra_moveit_config.git
 [submodule "src/astra_controller"]
 	path = src/astra_controller
-	url = https://github.com/hilookas/astra_controller.git
+	url = https://github.com/AstraCUHKSZ/astra_controller.git
 [submodule "src/astra_controller_interfaces"]
 	path = src/astra_controller_interfaces
-	url = https://github.com/hilookas/astra_controller_interfaces.git
+	url = https://github.com/AstraCUHKSZ/astra_controller_interfaces.git
 [submodule "non_ros_src/ModernRobotics"]
 	path = non_ros_src/ModernRobotics
 	url = https://github.com/NxRLab/ModernRobotics.git
@@ -33,7 +33,7 @@
 	url = https://github.com/hilookas/aiortc.git
 [submodule "non_ros_src/astra_teleop_web"]
 	path = non_ros_src/astra_teleop_web
-	url = https://github.com/hilookas/astra_teleop_web.git
+	url = https://github.com/AstraCUHKSZ/astra_teleop_web.git
 [submodule "non_ros_src/lerobot"]
 	path = non_ros_src/lerobot
 	url = https://github.com/hilookas/lerobot.git
@@ -46,3 +46,6 @@
 [submodule "src/simple_cap"]
 	path = src/simple_cap
 	url = https://github.com/hilookas/simple_cap
+[submodule "AstraFirmwares"]
+	path = AstraFirmwares
+	url = https://github.com/AstraCUHKSZ/AstraFirmwares.git
