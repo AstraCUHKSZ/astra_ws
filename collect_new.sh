@@ -1,0 +1,14 @@
+lerobot-record \
+  --robot.type=astra_joint \
+  --fps=30 \
+  --single-task="Pick the bottle and put it down elsewhere" \
+  --repo-id=cgluWxh/put_bottle \
+  --tags='["astra"]' \
+  --warmup-time-s=0 \
+  --episode-time-s=-1 \
+  --reset-time-s=-1 \
+  --num-episodes=50 \
+  --push-to-hub=true \
+  --resume=false \
+  --local-files-only=true \
+  --run-compute-stats=true
