@@ -53,7 +53,7 @@ lerobot-record \
   --dataset.episode_time_s=-1 \
   --dataset.reset_time_s=-1 \
   --dataset.push_to_hub=false \
-  --policy.path=./outputs/train/act_move_bottle/pretrained_model/ \
+  --policy.path=./outputs/train/smolvla_move_bottle/pretrained_model/ \
   --display_data=false \
   --play_sounds=false \
   --dataset.streaming_encoding=true \
