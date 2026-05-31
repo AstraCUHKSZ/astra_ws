@@ -39,14 +39,18 @@ if [ "$BRIDGE_READY" != true ]; then
   exit 1
 fi
 
+rm -rf /home/aha-robot/.cache/huggingface/lerobot/cgluWxh/put_bottle_new
+
 pushd non_ros_src/lerobot_new
+source ./.venv/bin/activate
 lerobot-record \
   --robot.type=astra_remote \
   --robot.host="$BRIDGE_HOST" \
   --robot.port="$BRIDGE_PORT" \
+  --robot.wait_for_reset_timeout_s=300 \
   --dataset.fps=30 \
   --dataset.single_task="Pick the bottle and put it down elsewhere" \
-  --dataset.repo_id=cgluWxh/put_bottle \
+  --dataset.repo_id=cgluWxh/put_bottle_new \
   --dataset.tags='["astra"]' \
   --dataset.episode_time_s=-1 \
   --dataset.reset_time_s=-1 \
@@ -54,5 +58,6 @@ lerobot-record \
   --dataset.push_to_hub=false \
   --dataset.streaming_encoding=true \
   --dataset.encoder_threads=2 \
+  --external_action_recording=true \
   --display_data=false \
   --play_sounds=false
