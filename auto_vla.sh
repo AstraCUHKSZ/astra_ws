@@ -3,7 +3,8 @@ BRIDGE_HOST=${ASTRA_BRIDGE_HOST:-127.0.0.1}
 BRIDGE_PORT=${ASTRA_BRIDGE_PORT:-8765}
 ROS_PYTHON_BIN=${ASTRA_ROS_PYTHON_BIN:-/usr/bin/python3}
 ROS_LOG_DIR=${ASTRA_ROS_LOG_DIR:-/tmp/astra_ros_logs}
-rm -rf /home/aha-robot/.cache/huggingface/lerobot/cgluWxh/eval_put_bottle/
+DATASET_REPO_ID=${ASTRA_DATASET_REPO_ID:-cgluWxh/eval_put_bottle}
+DATASET_ROOT=${ASTRA_DATASET_ROOT:-/home/aha-robot/.cache/huggingface/lerobot/cgluWxh/eval_put_bottle}
 
 (
   unset PYTHONHOME VIRTUAL_ENV
@@ -40,20 +41,82 @@ if [ "$BRIDGE_READY" != true ]; then
   exit 1
 fi
 
-pushd non_ros_src/lerobot_new
+pushd non_ros_src/lerobot_new >/dev/null
 source ./.venv/bin/activate
+
+RESUME_ARGS=()
+
+dataset_exists=false
+if [ -d "$DATASET_ROOT" ]; then
+  dataset_exists=true
+fi
+
+looks_like_lerobot_dataset=false
+if [ -f "$DATASET_ROOT/meta/info.json" ] || [ -d "$DATASET_ROOT/meta" ]; then
+  looks_like_lerobot_dataset=true
+fi
+
+if [ "$dataset_exists" = true ]; then
+  echo
+  echo "Found existing dataset directory:"
+  echo "  $DATASET_ROOT"
+  echo
+
+  if [ "$looks_like_lerobot_dataset" != true ]; then
+    echo "Warning: directory exists, but it does not clearly look like a LeRobot dataset."
+    echo "Expected something like:"
+    echo "  $DATASET_ROOT/meta/info.json"
+    echo
+  fi
+
+  while true; do
+    read -r -p "Resume previous recording, start from scratch, or quit? [r/n/q] " choice
+
+    case "$choice" in
+      r|R|resume|Resume)
+        echo "Resuming existing dataset."
+
+        if lerobot-record --help 2>&1 | grep -q -- "--control.resume"; then
+          RESUME_ARGS+=(--control.resume=true)
+        else
+          RESUME_ARGS+=(--resume=true)
+        fi
+
+        break
+        ;;
+
+      n|N|new|New)
+        echo "Deleting existing dataset and starting from scratch:"
+        echo "  $DATASET_ROOT"
+        rm -rf "$DATASET_ROOT"
+        break
+        ;;
+
+      q|Q|quit|Quit)
+        echo "Aborted."
+        exit 0
+        ;;
+
+      *)
+        echo "Please enter r, n, or q."
+        ;;
+    esac
+  done
+fi
+
 lerobot-record \
   --robot.type=astra_remote \
   --robot.host="$BRIDGE_HOST" \
   --robot.port="$BRIDGE_PORT" \
   --dataset.fps=30 \
   --dataset.single_task="Pick the bottle and put it down elsewhere" \
-  --dataset.repo_id=cgluWxh/eval_put_bottle \
+  --dataset.repo_id="$DATASET_REPO_ID" \
+  --dataset.root="$DATASET_ROOT" \
   --dataset.num_episodes=10 \
   --dataset.episode_time_s=-1 \
   --dataset.reset_time_s=-1 \
   --dataset.push_to_hub=false \
-  --policy.path=./outputs/train/smolvla_move_bottle/pretrained_model/ \
+  --policy.path=./outputs/train/smolvla_move_bottle_new/025000/pretrained_model/ \
   --display_data=false \
   --play_sounds=false \
   --dataset.streaming_encoding=true \
@@ -62,5 +125,8 @@ lerobot-record \
   --profile_timing=true \
   --async_policy=true \
   --async_policy_queue_threshold=8 \
-  --policy.use_amp=true
+  --policy.use_amp=false \
+  "${RESUME_ARGS[@]}"
 #  --async_policy_debug=true
+
+popd >/dev/null

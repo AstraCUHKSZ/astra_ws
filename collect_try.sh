@@ -1,8 +1,11 @@
+
 export DISPLAY=:1
+
 BRIDGE_HOST=${ASTRA_BRIDGE_HOST:-127.0.0.1}
 BRIDGE_PORT=${ASTRA_BRIDGE_PORT:-8765}
 ROS_PYTHON_BIN=${ASTRA_ROS_PYTHON_BIN:-/usr/bin/python3}
 ROS_LOG_DIR=${ASTRA_ROS_LOG_DIR:-/tmp/astra_ros_logs}
+
 DATASET_REPO_ID=${ASTRA_DATASET_REPO_ID:-cgluWxh/put_bottle_new}
 DATASET_ROOT=${ASTRA_DATASET_ROOT:-/home/aha-robot/.cache/huggingface/lerobot/cgluWxh/put_bottle_new}
 
@@ -10,8 +13,11 @@ DATASET_ROOT=${ASTRA_DATASET_ROOT:-/home/aha-robot/.cache/huggingface/lerobot/cg
   unset PYTHONHOME VIRTUAL_ENV
   export ROS_LOG_DIR
   mkdir -p "$ROS_LOG_DIR"
+
   source install/setup.bash
+
   "$ROS_PYTHON_BIN" -c 'import sys; assert sys.version_info[:2] == (3, 10), sys.version; import rclpy'
+
   PYTHONPATH="$PWD/src/astra_controller:${PYTHONPATH:-}" \
     exec "$ROS_PYTHON_BIN" -m astra_controller.lerobot_bridge_server \
       --host "$BRIDGE_HOST" \
@@ -119,7 +125,7 @@ lerobot-record \
   --robot.port="$BRIDGE_PORT" \
   --robot.wait_for_reset_timeout_s=300 \
   --dataset.fps=30 \
-  --dataset.single_task="Pick up the bottle then put it into the blue basket" \
+  --dataset.single_task="Pick the bottle and put it down elsewhere" \
   --dataset.repo_id="$DATASET_REPO_ID" \
   --dataset.root="$DATASET_ROOT" \
   --dataset.tags='["astra"]' \
