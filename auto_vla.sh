@@ -3,8 +3,8 @@ BRIDGE_HOST=${ASTRA_BRIDGE_HOST:-127.0.0.1}
 BRIDGE_PORT=${ASTRA_BRIDGE_PORT:-8765}
 ROS_PYTHON_BIN=${ASTRA_ROS_PYTHON_BIN:-/usr/bin/python3}
 ROS_LOG_DIR=${ASTRA_ROS_LOG_DIR:-/tmp/astra_ros_logs}
-DATASET_REPO_ID=${ASTRA_DATASET_REPO_ID:-cgluWxh/eval_put_bottle}
-DATASET_ROOT=${ASTRA_DATASET_ROOT:-/home/aha-robot/.cache/huggingface/lerobot/cgluWxh/eval_put_bottle}
+DATASET_REPO_ID=${ASTRA_DATASET_REPO_ID:-cgluWxh/eval_diff_multi_eval_test}
+DATASET_ROOT=${ASTRA_DATASET_ROOT:-/home/aha-robot/.cache/huggingface/lerobot/cgluWxh/eval_diff_multi_eval_test}
 
 (
   unset PYTHONHOME VIRTUAL_ENV
@@ -109,14 +109,14 @@ lerobot-record \
   --robot.host="$BRIDGE_HOST" \
   --robot.port="$BRIDGE_PORT" \
   --dataset.fps=30 \
-  --dataset.single_task="Pick the bottle and put it down elsewhere" \
+  --dataset.single_task="Use the right arm to pick up the right bottle" \
   --dataset.repo_id="$DATASET_REPO_ID" \
   --dataset.root="$DATASET_ROOT" \
   --dataset.num_episodes=10 \
   --dataset.episode_time_s=-1 \
   --dataset.reset_time_s=-1 \
   --dataset.push_to_hub=false \
-  --policy.path=./outputs/train/smolvla_move_bottle_new/025000/pretrained_model/ \
+  --policy.path=./outputs/train/diff_multi/030000/pretrained_model/ \
   --display_data=false \
   --play_sounds=false \
   --dataset.streaming_encoding=true \
