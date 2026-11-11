@@ -17,6 +17,8 @@ class LiftController:
     COMM_TYPE_PONG = 0x01
     COMM_TYPE_CTRL = 0x02
     COMM_TYPE_FEEDBACK = 0x03
+    COMM_TYPE_SET_POS = 0x04
+    COMM_TYPE_HOME = 0x05
 
     STEPPER_PULSE_PER_REV = 800 # pulse/rev
     RAIL_MM_PER_REV = 75 # mm/rev
@@ -46,6 +48,8 @@ class LiftController:
         self.last_velocity = None
         self.last_effort = None
         self.last_time = None
+        self.initialized = False # 固件是否已初始化(上位机置位或找到光电门)
+        self.is_homing = False
 
         self.write_lock = threading.Lock()
         
@@ -75,7 +79,10 @@ class LiftController:
                     if self.pong_cb is not None:
                         self.pong_cb(struct.unpack('>xxHHHHHHxxxx', data))
                 elif data[1] == self.COMM_TYPE_FEEDBACK:
-                    position = self.to_si_unit(*struct.unpack('>xxIxxxxxxxxxxxx', data))
+                    raw_pos, flags = struct.unpack('>xxiIxxxxxxxx', data)
+                    position = self.to_si_unit(raw_pos)
+                    self.initialized = bool(flags & 1)
+                    self.is_homing = bool(flags & 2)
                     this_time = time.time()
                     with self.lock:
                         if self.last_time is None:
@@ -114,6 +121,17 @@ class LiftController:
                 self.error_cb(f"Joint #{1} reach limit")
         else:
             self.write(struct.pack('>BBIxxxxxxxxxxxx', self.COMM_HEAD, self.COMM_TYPE_CTRL, self.to_raw_unit(pos)))
+
+    def set_origin(self, pos):
+        """把当前物理位置设为 pos (米)，同时视为已初始化"""
+        if not (0 <= pos <= self.RAIL_MAX_LENGTH_MM / 1000):
+            logger.error(f"set_origin out of range: {pos}")
+            return
+        self.write(struct.pack('>BBIxxxxxxxxxxxx', self.COMM_HEAD, self.COMM_TYPE_SET_POS, self.to_raw_unit(pos)))
+
+    def home(self):
+        """向光电门方向最多走半程找光电门，找到后位置置 0"""
+        self.write(struct.pack('>BBxxxxxxxxxxxxxxxx', self.COMM_HEAD, self.COMM_TYPE_HOME))
 
     def stop(self):
         if not self.quit.is_set():

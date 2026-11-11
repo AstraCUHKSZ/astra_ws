@@ -34,7 +34,7 @@ POSE_DEADZONE_ENABLED = False
 # Independently block left/right handle motion from publishing arm goals.
 # reset_arm() uses a separate publication path and is intentionally unaffected.
 ARM_MOVEMENT_LOCKED = {
-    "left": True,
+    "left": False,
     "right": False,
 }
 

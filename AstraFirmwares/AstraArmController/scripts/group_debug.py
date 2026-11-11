@@ -7,9 +7,9 @@ import argparse
 # Config
 BAUDRATE = 921600
 HEADER = 0x5A
-# IDS = [4, 5, 6, 7]  # Target Motor IDs for testing
+IDS = [4, 5, 6, 7]  # Target Motor IDs for testing
 # IDS = [8, 9, 10, 11]  # Alternative Motor IDs for testing
-IDS = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]  # Extended Motor IDs for testing
+# IDS = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]  # Extended Motor IDs for testing
 # IDS = [12, 13, 14, 15]  # Alternative Motor IDs for testing
 
 # Comm Types
@@ -157,7 +157,7 @@ def main():
                 
                 # Enable Torque Only for Target
                 for id in IDS:
-                    if id == target_id and id != 11:
+                    if id == target_id:
                         set_torque_enable(ser, id, True)
                     else:
                         set_torque_enable(ser, id, False) # Ensure others are free
@@ -165,7 +165,7 @@ def main():
                 set_servo_pwm(ser, target_id, pwm_val)
                 
                 start = time.time()
-                while time.time() - start < 1.0:
+                while time.time() - start < 0.5:
                     stat = get_servo_status(ser, target_id)
                     if stat:
                         sys.stdout.write(f"\rPos: {stat['pos']} Load: {stat['load']} Speed: {stat['speed']}")
@@ -205,7 +205,7 @@ def main():
                     set_servo_pwm(ser, id, pwm)
                     
                 start = time.time()
-                while time.time() - start < 1.0:
+                while time.time() - start < 0.5:
                      for id in IDS:
                          s = get_servo_status(ser, id)
                          if s:

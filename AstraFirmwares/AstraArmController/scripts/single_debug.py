@@ -7,8 +7,8 @@ import argparse
 # Config
 BAUDRATE = 921600
 HEADER = 0x5A
-IDS = [12, 13, 14, 15]  # Target Motor IDs for testing (Non-joint)
-# IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]  # Target Motor IDs for testing (Joint)
+# IDS = [12, 13, 14, 15]  # Target Motor IDs for testing (Non-joint)
+IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]  # Target Motor IDs for testing (Joint)
 
 # Comm Types
 COMM_TYPE_DEBUG = 9

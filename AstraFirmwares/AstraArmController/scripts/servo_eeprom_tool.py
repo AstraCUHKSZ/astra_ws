@@ -13,7 +13,10 @@ python3 scripts/servo_eeprom_tool.py /dev/tty_puppet_right write 12 21 28
 python3 scripts/servo_eeprom_tool.py /dev/tty_puppet_right get-id 12
 
 # 将ID 1改为12
-python3 scripts/servo_eeprom_tool.py /dev/tty_puppet_right set-id 1 12"""
+python3 scripts/servo_eeprom_tool.py /dev/tty_puppet_right set-id 1 12
+
+# 直接将12号舵机设为PWM模式(2)，并由控制器回读验证
+python3 scripts/servo_eeprom_tool.py /dev/tty_puppet_right set-mode 12 2"""
 
 import argparse
 import serial
@@ -29,6 +32,8 @@ COMM_TYPE_DEBUG = 9
 SUBCMD_DEBUG_MODE = 0
 SUBCMD_EEPROM_READ = 5
 SUBCMD_EEPROM_WRITE = 6
+
+SMS_STS_MODE = 33
 
 STATUS_TEXT = {
     0: "ok",
@@ -66,7 +71,7 @@ REGISTERS = (
     ("protection_current", 28, 2),
     ("angular_resolution", 30, 1),
     ("position_offset", 31, 2),
-    ("mode", 33, 1),
+    ("mode", SMS_STS_MODE, 1),
     ("protection_torque", 34, 1),
     ("protection_time", 35, 1),
     ("overload_torque", 36, 1),
@@ -183,6 +188,14 @@ def build_parser():
     set_id = sub.add_parser("set-id", help="change a connected servo's ID")
     set_id.add_argument("current_id", type=parse_int)
     set_id.add_argument("new_id", type=parse_int)
+
+    set_mode = sub.add_parser(
+        "set-mode",
+        help="write a servo mode and verify the EEPROM readback")
+    set_mode.add_argument("id", type=parse_int)
+    set_mode.add_argument(
+        "mode", type=parse_int,
+        help="raw SMS/STS mode value (for this firmware: 0=position, 2=PWM)")
     return parser
 
 
@@ -190,7 +203,7 @@ def validate_args(args, parser):
     ids = []
     if args.command == "dump":
         ids = args.ids
-    elif args.command in ("read", "write", "get-id"):
+    elif args.command in ("read", "write", "get-id", "set-mode"):
         ids = [args.id]
     elif args.command == "set-id":
         ids = [args.current_id, args.new_id]
@@ -206,6 +219,8 @@ def validate_args(args, parser):
         if args.address <= 5 < args.address + args.width and not (
                 args.address == 5 and args.width == 1 and args.value <= 253):
             parser.error("writes overlapping the ID register must use address 5, width 1, value 0..253")
+    if args.command == "set-mode" and not 0 <= args.mode <= 0xFF:
+        parser.error("mode must fit in one byte: 0..255")
 
 
 def main():
@@ -247,6 +262,10 @@ def main():
             readback, resulting_id = tool.write(args.current_id, 5, 1, args.new_id)
             print(f"servo ID changed: {args.current_id} -> {resulting_id}; "
                   f"readback={readback}")
+        elif args.command == "set-mode":
+            readback, resulting_id = tool.write(
+                args.id, SMS_STS_MODE, 1, args.mode)
+            print(f"verified ID {resulting_id} mode: {readback}")
     except (ProtocolError, serial.SerialException) as exc:
         parser.exit(1, f"error: {exc}\n")
     finally:

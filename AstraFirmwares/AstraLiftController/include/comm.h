@@ -17,6 +17,8 @@ typedef enum {
   COMM_TYPE_PONG,
   COMM_TYPE_CTRL,
   COMM_TYPE_FEEDBACK,
+  COMM_TYPE_SET_POS, // 把当前位置设为 pos[0]
+  COMM_TYPE_HOME,    // 向光电门方向最多走半程找光电门
 } comm_type_t;
 
 extern int comm_payload_size[];

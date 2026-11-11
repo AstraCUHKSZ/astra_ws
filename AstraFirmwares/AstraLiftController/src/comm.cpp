@@ -37,6 +37,8 @@ int comm_payload_size[] = {
   16, // COMM_TYPE_PONG
   16, // COMM_TYPE_CTRL
   16, // COMM_TYPE_FEEDBACK
+  16, // COMM_TYPE_SET_POS
+  16, // COMM_TYPE_HOME
 };
 
 // 不能被忽略的数据包
@@ -47,6 +49,8 @@ bool comm_type_importance[] = {
   false, // COMM_TYPE_PONG
   false, // COMM_TYPE_CTRL
   false, // COMM_TYPE_FEEDBACK
+  true,  // COMM_TYPE_SET_POS 不能被后续 CTRL 覆盖丢弃
+  true,  // COMM_TYPE_HOME
 };
 
 // 堵塞发送一个数据包
