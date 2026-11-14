@@ -1,0 +1,4 @@
+Use the left arm to pick up the left bottle
+Use the left arm to pick up the right bottle
+Use the right arm to pick up the right bottle
+Use the right arm to pick up the left bottle

@@ -1,0 +1,9 @@
+# 每行一个 prompt；--prompts 时第 i 条 episode 用第 (i mod 行数) 行，--hotkeys 时数字键 1-9 对应前 9 行
+Pick up the left bottle
+Pick up the right bottle
+Pick up the middle bottle
+Use the left arm to pick up the middle bottle
+Use the right arm to pick up the middle bottle
+Use the left arm
+Use the right arm
+Pick up the bottle
